@@ -1,0 +1,210 @@
+entity  ProjectTemplate {
+	Id Long,
+    serviceId Long required,
+    templateDescription String required,
+    templateCreationClass  String required,
+    whenCreated Datetime required
+}
+
+entity Project {
+	Id Long,
+	memberId Long required,
+    createdByMemberId Long required,
+    serviceId Long required,
+    status Status required,
+    whenCreated Datetime required
+ }
+
+entity ProjectPermission {
+	Id Long,
+	projectId Long required,
+	memberId Long required,
+    inviterId Long required,
+    relationshipToInviter String,
+    imageId Long,
+	permission Permission required,
+    whenCreated Datetime required
+}
+
+entity Recipient {
+	Id Long
+	projectId Long required,
+    firstName String required,
+	lastName String required,
+    birthYear Integer,
+    gender Gender,
+	relationshipToYou String,
+    description String,
+    imageId Long,
+    status Status required,
+    whenCreated Datetime required
+}
+
+entity Concerns {
+	Id Long,
+    recipientId Long required,
+	description String required,
+	status Status required,
+	whenCreated Datetime required
+}
+
+entity Responsibilities {
+	Id Long,
+    recipientId Long required,
+	description String required,
+	status Status required,
+	whenCreated Datetime required
+}
+
+entity RecipientItemPermission
+ {
+ 	Id Long
+	recipientItemId Long required,
+    memberId Long required,
+	permission Permission required,
+    whenCreated Datetime required
+}
+
+entity RecipientItem {
+	Id Long,
+	recipientId Long required,
+    permissionToAll Boolean required,
+	taskId Long,
+	documentId Long,
+	whenCreated Datetime required
+}
+
+entity Invitee {
+	Id Long,
+    inviter Long required,
+	projectId Long required,
+	recipientItemId Long required,
+	firstName String required,
+    emailAddress String required,
+    status InviteeStatus required,
+	whenCreated Datetime required
+}
+
+entity Task {
+	Id Long,
+    name String required,
+	description String required,
+    category String,
+    assignedToMember Long,
+    dueDate Datetime,
+	status TaskStatus required,
+	whenCreated Datetime required
+}
+
+entity Document {
+	Id Long,
+	fileName String,
+    extension String,
+	fileId Long,
+	whenCreated Datetime required
+}
+
+entity Message {
+	Id Long,
+	projectId Long,
+    recipientId Long,
+    recipientItemId Long,
+    postedByMemberId Long required,
+    messageBody String,
+    whenCreated Datetime required
+}
+
+entity MessageItem {
+	Id Long,
+	messageId Long required,
+    recipientItemId Long required,
+    whenCreated Datetime required
+}
+
+enum Permission {
+    NONE, READ, EDIT
+}
+
+enum Status {
+    DRAFT, INACTIVE, ACTIVE
+}
+
+enum TaskStatus {
+    OPEN, COMPLETED, DELETED
+}
+
+enum InviteeStatus {
+    INVITED, ACCEPTED
+}
+
+
+enum Gender {
+    MALE, FEMALE, GENDER_NEUTRAL
+}
+
+relationship ManyToOne {
+	Recipient{projectId} to Project
+}
+
+relationship ManyToOne {
+	ProjectPermission{projectId} to Project
+}
+
+relationship ManyToOne {
+	RecipientItemPermission{recipientItemId} to RecipientItem,
+    RecipientItemPermission{memberId} to ProjectPermission{memberId}
+}
+
+relationship ManyToOne {
+    Invitee{inviter} to ProjectPermission{memberId},
+	Invitee{projectId} to Project,
+    Invitee{recipientItemId} to RecipientItem 
+}
+
+relationship ManyToOne {
+	RecipientItem{recipientId} to Recipient
+}
+relationship ManyToOne {
+	Concerns{recipientId} to Recipient
+}
+
+relationship ManyToOne {
+	Responsibilities{recipientId} to Recipient
+}
+
+
+relationship ManyToOne {
+	Message{projectId} to Project,
+    Message{recipientId} to Recipient,
+    Message{recipientItemId} to RecipientItem, 
+    Message{postedByMemberId} to ProjectPermission{memberId}
+}
+
+relationship ManyToOne {
+	MessageItem{messageId} to Message
+    MessageItem{recipientItemId} to RecipientItem 
+}
+
+relationship ManyToOne {
+	Task{assignedToMember} to ProjectPermission{memberId}
+}
+
+relationship OneToOne {
+	RecipientItem{taskId} to Task
+    RecipientItem{documentId} to Document 
+}
+
+
+
+// Set pagination options
+// paginate JobHistory, Employee with infinite-scroll
+// paginate Job with pagination
+
+// Use Data Transfert Objects (DTO)
+ // dto * with mapstruct
+
+// Set service options to all except few
+service all with serviceImpl 
+
+// Set an angular suffix
+// angularSuffix * with mySuffix
